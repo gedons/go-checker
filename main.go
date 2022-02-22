@@ -5,21 +5,18 @@ import (
 )
 
 func main() {
-	 input := 1
+	 var input int
+	 fmt.Scanln(input)
 
-	fmt.Printf("======================== Welcome To DSPG Microsoft Imagine Academy Student Result Checker ========================\n")
-	fmt.Print("Select (1) to login as a Student\n")
-	fmt.Print("Select (2) to login as a Teacher\n")
+ 
 
-	switch input {
+		switch input {
 
-	case 1:
-		studentLogin()
-	case 2:
-		teacherLogin()
-	default:
-		fmt.Println("Invalid Selection")
+		case 1:
+			fmt.Println("Winter.")
 
+		case 2:
+			fmt.Println("Autumn.")
 	}
 }
 
