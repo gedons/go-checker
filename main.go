@@ -2,21 +2,30 @@ package main
 
 import (
 	"fmt"
+	"github.com/TwiN/go-color"
 )
 
+
 func main() {
-	 var input int
-	 fmt.Scanln(input)
 
- 
+	fmt.Printf("\n\t\t================== Welcome To DSPG Microsoft Imagine Academy Student Result Checker ================== \n")
+	fmt.Printf("Input (1) to login as a STUDENT\n")
+	fmt.Printf("Input (2) to login as a TEACHER\n")
 
-		switch input {
+	//get the user input in the switch case for the two available functions so far
+	var input int
+	fmt.Scan(&input)
 
-		case 1:
-			fmt.Println("Winter.")
+	switch input {
 
-		case 2:
-			fmt.Println("Autumn.")
+	case 1:
+		studentLogin()
+
+	case 2:
+		teacherLogin()
+
+	default:
+		fmt.Printf("Invalid Selection \n")
 	}
 }
 
@@ -26,5 +35,32 @@ func studentLogin() {
 }
 
 func teacherLogin() {
-	fmt.Println("teachers")
+
+	username := "admin"
+	password := "12345"
+	var iuname string
+	var ipass string
+
+	fmt.Printf("\n\t\t================== Teacher Login ================== \n")
+
+	for {
+		fmt.Println("Input Username : ")
+		fmt.Scan(&iuname)
+
+		fmt.Println("Input Password : ")
+		fmt.Scan(&ipass)
+
+		if iuname == username && ipass == password {
+			teacherWindow()
+			break
+
+		} else {
+			fmt.Println("Invalid Details")
+			continue
+		}
+	}
+}
+
+func teacherWindow() {
+	fmt.Println("teacher window")
 }
