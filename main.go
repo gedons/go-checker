@@ -2,9 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"runtime"
 	"time"
 
@@ -31,6 +33,8 @@ func main() {
 
 	default:
 		fmt.Printf("Invalid Selection \n")
+		time.Sleep(2 * time.Second)
+		main()
 	}
 }
 
@@ -74,9 +78,8 @@ func teacherWindow() {
 	fmt.Printf("\n\t\t Follow the instructions below!!!!\n\n")
 	fmt.Printf("\t 1 To Insert Student Details\n\n")
 	fmt.Printf("\t 2 To View Student Details\n\n")
-	fmt.Printf("\t 3 To Update Student Details\n\n")
-	fmt.Printf("\t 4 To Delete Student Details\n\n")
-	fmt.Printf("\t 5 To Logout\n\n")
+	fmt.Printf("\t 3 To Delete Student Details\n\n")
+	fmt.Printf("\t 4 To Logout\n\n")
 
 	var teacherInput int
 	fmt.Scan(&teacherInput)
@@ -87,13 +90,13 @@ func teacherWindow() {
 	case 2:
 		teacherWindowView()
 	case 3:
-		teacherWindowUpdate()
-	case 4:
 		teacherWindowDelete()
-	case 5:
+	case 4:
 		teacherLogin()
 	default:
 		fmt.Println("Invalid Selection")
+		time.Sleep(2 * time.Second)
+		teacherWindow()
 	}
 
 }
@@ -108,7 +111,7 @@ func teacherWindowInsert() {
 
 	fmt.Println("Input Student Firstname : ")
 	fmt.Scan(&fname)
-	var path = fname +".txt"
+	var path = fname + ".txt"
 
 	fmt.Println("Input Student Lastname : ")
 	fmt.Scan(&lname)
@@ -122,16 +125,15 @@ func teacherWindowInsert() {
 	total = score1 + score2
 
 	// check if file exists
-    var _, err = os.Stat(path)
-    // create file if not exists
-    if os.IsNotExist(err) {
-        var file, err = os.Create(path)
+	var _, err = os.Stat(path)
+	// create file if not exists
+	if os.IsNotExist(err) {
+		var file, err = os.Create(path)
 		if err != nil {
 			log.Fatal(err)
 		}
-        defer file.Close()
-    }
-
+		defer file.Close()
+	}
 
 	//WRITING STUDENT DETAILS TO A FILE
 	//first open the file
@@ -142,13 +144,13 @@ func teacherWindowInsert() {
 	defer file1.Close()
 
 	//then write some texts line by line
-	 _, err1 = file1.WriteString("First Name : " +fname +"\n")
-	 if err1 != nil {
+	_, err1 = file1.WriteString("First Name : " + fname + "\n")
+	if err1 != nil {
 		log.Fatal(err1)
 	}
 
-	_, err1 = file1.WriteString("Last Name : " +lname+"\n")
-		if err1 != nil {
+	_, err1 = file1.WriteString("Last Name : " + lname + "\n")
+	if err1 != nil {
 		log.Fatal(err1)
 	}
 
@@ -165,7 +167,7 @@ func teacherWindowInsert() {
 	_, err1 = file1.WriteString(fmt.Sprintf("Total Score : %d\n", total))
 	if err1 != nil {
 		log.Fatal(err1)
-}
+	}
 
 	// Save file changes.
 	err1 = file1.Sync()
@@ -173,27 +175,115 @@ func teacherWindowInsert() {
 		log.Fatal(err1)
 	}
 
-    fmt.Printf("Student Details Created Successfully (%v)\n", path)
+	fmt.Printf("Student Details Created Successfully (%v)\n", path)
 
-		println(color.Ize(color.Green, "REDIRECTING TO HOME......."))
-			time.Sleep(2 * time.Second)
-			CallClear()
-			teacherWindowInsert()
+	println(color.Ize(color.Green, "REDIRECTING TO HOME......."))
+	time.Sleep(3 * time.Second)
+	CallClear()
+	teacherWindow()
 
 }
 
 
 func teacherWindowView() {
 
-}
-func teacherWindowUpdate() {
+	var path string
+
+	fmt.Println("\t Available Student Records")
+	//lists all the files in the directory
+	files, err := os.ReadDir("./")
+	if err != nil{
+		fmt.Println(err.Error())
+	}
+	if files == nil {
+		fmt.Println("No Records Available!!!")
+		time.Sleep(3 * time.Second)
+		teacherWindow()
+	}
+
+	// returns all the files with a .txt extension
+	for _, f := range files {
+		if filepath.Ext(f.Name()) == ".txt" {
+			fmt.Println(f.Name())
+		}
+
+	}
+
+	fmt.Println("\t Input A Student Name Above To View Details")
+	fmt.Scan(&path)
+
+	// Open file for reading.
+	var file, err2 = os.OpenFile(path, os.O_RDWR, 0644)
+	if err2 != nil {
+		println(color.Ize(color.Red, "INVALID FILE SELECTED"))
+		time.Sleep(2 * time.Second)
+		teacherWindow()
+	}
+	defer file.Close()
+
+	// Read file, line by line
+	var text = make([]byte, 1024)
+	for {
+		_, err2 = file.Read(text)
+
+		// Break if finally arrived at end of file
+		if err2 == io.EOF {
+			break
+		}
+		// Break if error occured
+		if err2 != nil && err2 != io.EOF {
+			fmt.Println(err2.Error())
+			break
+		}
+	}
+
+	//display file
+	println(color.Ize(color.Green, "OPENING RECORD, PLEASE WAIT...."))
+	time.Sleep(3 * time.Second)
+	fmt.Println(string(text))
+	teacherWindow()
 
 }
+
+
 func teacherWindowDelete() {
+	
+	var path string
 
+	fmt.Println("\t Available Student Records")
+	//lists all the files in the directory
+	files, err := os.ReadDir("./")
+	if err != nil {
+		fmt.Println(err.Error())
+		time.Sleep(2 * time.Second)
+		teacherWindow()
+	}
+
+	// returns all the files with a .txt extension
+	for _, f := range files {
+		if filepath.Ext(f.Name()) == ".txt" {
+			fmt.Println(f.Name())
+		}
+
+	}
+
+	fmt.Println("\t Input A Student Name Above To Delete Details")
+	fmt.Scan(&path)
+
+	 // delete file
+	 var errs = os.Remove(path)
+	 if errs != nil {
+		fmt.Println(errs.Error())
+		time.Sleep(2 * time.Second)
+		teacherWindow()
+	}
+
+	println(color.Ize(color.Red, "DELETING....."))
+	time.Sleep(3 * time.Second)
+	fmt.Println(color.Ize(color.Green, "DELETED SUCCESSFULLY!!!"))
+	time.Sleep(2 * time.Second)
+	teacherWindow()
 }
-
-
 
 // func studentWindow() {
 // 	fmt.Println("student window")
